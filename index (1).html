@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Marcador Pádel Completo</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: transparent; color: white; }
+    .scoreboard { display:flex; gap:20px; background: rgba(0,0,0,0.7); padding: 16px 24px; border-radius: 16px; width: fit-content; }
+    .team { min-width: 280px; }
+    .name { font-size: 24px; font-weight: bold; margin-bottom: 8px; }
+    .line { font-size: 28px; margin: 6px 0; }
+    .controls { margin-top: 25px; color: black; }
+    button { font-size: 16px; padding: 8px 12px; margin: 4px; }
+  </style>
+</head>
+<body>
+  <div class="scoreboard">
+    <div class="team">
+      <div class="name" id="team1Name">Cosmocel Fuentes</div>
+      <div class="line">Sets: <span id="sets1">0</span></div>
+      <div class="line">Juegos: <span id="games1">0</span></div>
+      <div class="line">Puntos: <span id="points1">0</span></div>
+    </div>
+    <div class="team">
+      <div class="name" id="team2Name">X3 Biomovil</div>
+      <div class="line">Sets: <span id="sets2">0</span></div>
+      <div class="line">Juegos: <span id="games2">0</span></div>
+      <div class="line">Puntos: <span id="points2">0</span></div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div style="margin-bottom:12px;">
+      <input id="name1Input" type="text" placeholder="Equipo 1" value="Cosmocel Fuentes" />
+      <input id="name2Input" type="text" placeholder="Equipo 2" value="X3 Biomovil" />
+      <button onclick="updateNames()">Actualizar nombres</button>
+    </div>
+    <button onclick="point(1)">+ Punto Eq.1</button>
+    <button onclick="undoPoint(1)">- Punto Eq.1</button>
+    <button onclick="point(2)">+ Punto Eq.2</button>
+    <button onclick="undoPoint(2)">- Punto Eq.2</button>
+    <br>
+    <button onclick="game(1)">+ Juego Eq.1</button>
+    <button onclick="undoGame(1)">- Juego Eq.1</button>
+    <button onclick="game(2)">+ Juego Eq.2</button>
+    <button onclick="undoGame(2)">- Juego Eq.2</button>
+    <br>
+    <button onclick="setWin(1)">+ Set Eq.1</button>
+    <button onclick="undoSet(1)">- Set Eq.1</button>
+    <button onclick="setWin(2)">+ Set Eq.2</button>
+    <button onclick="undoSet(2)">- Set Eq.2</button>
+    <br>
+    <button onclick="resetAll()">Reset</button>
+  </div>
+
+  <script>
+    let sets=[0,0], games=[0,0], p=[0,0];
+    const labels=['0','15','30','40','AD'];
+
+    function render(){
+      document.getElementById('sets1').textContent=sets[0];
+      document.getElementById('sets2').textContent=sets[1];
+      document.getElementById('games1').textContent=games[0];
+      document.getElementById('games2').textContent=games[1];
+      document.getElementById('points1').textContent=labels[p[0]];
+      document.getElementById('points2').textContent=labels[p[1]];
+    }
+
+    function point(team){
+      let a=team-1, b=1-a;
+      if (p[a] < 3) p[a]++;
+      else if (p[a]===3 && p[b]<3) { winGame(a); return; }
+      else if (p[a]===3 && p[b]===3) p[a]=4;
+      else if (p[a]===4) { winGame(a); return; }
+      else if (p[b]===4) p[b]=3;
+      render();
+    }
+
+    function winGame(a){
+      games[a]++;
+      p=[0,0];
+      if (games[a] >= 6 && games[a]-games[1-a] >= 2) {
+        sets[a]++;
+        games=[0,0];
+      }
+      render();
+    }
+
+    function undoPoint(team){
+      let a=team-1;
+      if (p[a] > 0) p[a]--;
+      render();
+    }
+
+    function game(team){ games[team-1]++; render(); }
+    function undoGame(team){ if (games[team-1] > 0) games[team-1]--; render(); }
+
+    function setWin(team){ sets[team-1]++; render(); }
+    function undoSet(team){ if (sets[team-1] > 0) sets[team-1]--; render(); }
+
+    function updateNames(){
+      document.getElementById('team1Name').textContent = document.getElementById('name1Input').value || 'Equipo 1';
+      document.getElementById('team2Name').textContent = document.getElementById('name2Input').value || 'Equipo 2';
+    }
+
+    function resetAll(){ sets=[0,0]; games=[0,0]; p=[0,0]; render(); }
+    render();
+  </script>
+</body>
+</html>
